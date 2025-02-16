@@ -8,6 +8,7 @@ import { auth } from "~/server/auth";
 import { db } from "~/server/db";
 import { eq } from "drizzle-orm";
 import { accounts } from "~/server/db/schema"; 
+import { getNotes } from "~/server/actions/note";
 
 // Function to fetch email content using Gmail API
 async function fetchEmail() {
@@ -43,7 +44,6 @@ async function fetchEmail() {
   let messagesList;
 
   try {
-
     console.log("Before calling Gmail API for messages list");
     messagesList = await gmail.users.messages.list({
       userId: "me",
@@ -53,7 +53,8 @@ async function fetchEmail() {
     console.log("After calling Gmail API, response: ", messagesList.data);
   } catch (error) {
     console.error("Error fetching email list: ", error);
-    return new Response(JSON.stringify({ error: "Failed to fetch emails", details: error.message }), { status: 500 });
+    const errorMessage = (error as Error).message;
+    return new Response(JSON.stringify({ error: "Failed to fetch emails", details: errorMessage }), { status: 500 });
   }
 
   console.log("Invoked3 ");
@@ -94,7 +95,6 @@ async function fetchEmail() {
   return emailSummaries.join("\n\n");
 }
 
-// Tool definition for reading emails
 const readEmail = tool({
   description: "Reads the last 5 emails from your inbox.",
   parameters: z.object({}),
@@ -103,17 +103,35 @@ const readEmail = tool({
   },
 });
 
+const readNotes = tool({
+  description: "Fetch all notes from the database, ordered by creation date.",
+  parameters: z.object({}),
+  execute: async () => {
+    const allNotes = getNotes();
+    return allNotes;
+  },
+});
+
 export async function POST(req: Request) {
   const { messages } = (await req.json()) as { messages: Array<Message> };
 
   const result = streamText({
     model: google("gemini-2.0-flash"),
-    system: "You are a helpful assistant that summarizes the last 5 emails. use readEmail tool to read the emails and then summarize.",
+    system: `You are an efficient AI assistant designed to summarize key information.
+    
+    Your tasks:
+    1. Retrieve the last 5 emails using the "readEmail" tool.
+    2. Retrieve important notes using the "readNotes" tool.
+    3. Provide a concise summary of the retrieved emails, prioritizing important details.
+    4. If applicable, cross-reference the emails with existing notes to enhance the summary.
+    
+    Be structured, factual, and ensure clarity in your responses.`,
     messages,
     tools: {
       readEmail,
+      readNotes,
     },
-    maxSteps: 5,
+    maxSteps: 10,
   });
 
   return result.toDataStreamResponse();
