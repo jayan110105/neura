@@ -7,6 +7,7 @@ import {
   text,
   timestamp,
   varchar,
+  json
 } from "drizzle-orm/pg-core";
 import { type AdapterAccount } from "next-auth/adapters";
 
@@ -39,6 +40,30 @@ export const posts = createTable(
     nameIndex: index("name_idx").on(example.name),
   })
 );
+
+export const notes = createTable(
+  "note",
+  {
+    id: varchar("id", { length: 255 }).primaryKey(),
+    title: varchar("title", { length: 256 }).notNull(),
+    content: text("content").notNull(),
+    createdById: varchar("created_by", { length: 255 })
+      .notNull()
+      .references(() => users.id),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .default(sql`CURRENT_TIMESTAMP`)
+      .notNull(),
+    tags: json("tags").$type<string[]>().notNull(),
+    category: varchar("category", { length: 20 })
+      .$type<"work" | "personal" | "ideas" | "tasks">()
+      .notNull(),
+  },
+  (example) => ({
+    titleIndex: index("title_idx").on(example.title),
+    categoryIndex: index("category_idx").on(example.category),
+  })
+);
+
 
 export const users = createTable("user", {
   id: varchar("id", { length: 255 })

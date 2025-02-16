@@ -1,5 +1,7 @@
 "use client";
 
+import { useState, useEffect, useTransition } from "react";
+import { getNotes, addNote } from "~/server/actions/note"
 import { ScrollArea } from "~/components/ui/scroll-area";
 import { Input } from "~/components/ui/input";
 import { Button } from "~/components/ui/button";
@@ -9,15 +11,16 @@ import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "~
 import { Textarea } from "~/components/ui/textarea";
 import { Badge } from "~/components/ui/badge";
 import { Search, Plus, Filter, SortDesc, Tag, X } from "lucide-react";
-import { useState } from "react";
 import { format } from "date-fns";
 import { v4 as uuidv4 } from "uuid";
+import { useSession } from "next-auth/react"
 
 interface Note {
   id: string;
   title: string;
   content: string;
-  timestamp: string;
+  createdById: string;
+  createdAt: Date;
   tags: string[];
   category: 'work' | 'personal' | 'ideas' | 'tasks';
 }
@@ -30,26 +33,8 @@ const categoryColors = {
 };
 
 export default function NotesPage() {
-  const [notes, setNotes] = useState<Note[]>([
-    {
-      id: '1',
-      title: 'Project Ideas',
-      content: 'Brainstorming session for new features...',
-      timestamp: new Date().toISOString(),
-      tags: ['project', 'brainstorm', 'features'],
-      category: 'ideas',
-    },
-    {
-      id: '2',
-      title: 'Meeting Notes',
-      content: 'Weekly team sync discussion points...',
-      timestamp: new Date().toISOString(),
-      tags: ['meeting', 'team', 'sync'],
-      category: 'work',
-    },
-  ]);
-
-
+  const { data: session } = useSession()
+  const [notes, setNotes] = useState<Note[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [newNote, setNewNote] = useState<{ 
     title: string; 
@@ -63,6 +48,18 @@ export default function NotesPage() {
     category: "work",
   });
   const [tagInput, setTagInput] = useState("");
+  const [isPending, startTransition] = useTransition();
+
+  useEffect(() => {
+    async function fetchNotes() {
+      const notesFromDb = await getNotes();
+      setNotes(notesFromDb);
+    }
+    fetchNotes().catch((error) => {
+      console.error("Failed to fetch notes:", error);
+    });
+
+  }, []);
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter" && tagInput.trim() !== "") {
@@ -89,7 +86,7 @@ export default function NotesPage() {
       note.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       note.tags.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase()))
     )
-    .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+    .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 
   const handleAddNote = () => {
     if (!newNote.title || !newNote.content) return;
@@ -98,13 +95,18 @@ export default function NotesPage() {
       id: uuidv4(),
       title: newNote.title,
       content: newNote.content,
-      timestamp: new Date().toISOString(),
+      createdById: session?.user.id ?? "", // Replace with actual user ID
+      createdAt: new Date(),
       tags: newNote.tags,
       category: newNote.category as Note["category"],
     };
 
-    setNotes([note, ...notes]);
-    setNewNote({ title: "", content: "", tags: [], category: "work" });
+    startTransition(async () => {
+      await addNote(note);
+      setNewNote({ title: "", content: "", tags: [], category: "work" });
+      const updatedNotes = await getNotes();
+      setNotes(updatedNotes);
+    });
     // setDialogOpen(false);
   };
 
@@ -158,23 +160,13 @@ export default function NotesPage() {
                 ))}
               </div>
               <div className="text-xs text-muted-foreground">
-                {format(new Date(note.timestamp), 'MMM d, yyyy HH:mm')}
+                {format(new Date(note.createdAt), 'MMM d, yyyy HH:mm')}
               </div>
             </Card>
           ))}
         </div>
         )}
       </ScrollArea>
-
-      {/* Floating Action Button */}
-      {/* <Button
-        size="lg"
-        className="fixed bottom-6 right-6 rounded-full shadow-lg"
-        onClick={() => setDialogOpen(true)}
-      >
-        <Plus className="h-4 w-4 mr-2" />
-        New Note
-      </Button> */}
 
       {/* Add Note Dialog */}
       <Dialog>
@@ -252,7 +244,9 @@ export default function NotesPage() {
               </DialogClose>
 
               <DialogClose asChild>
-                <Button onClick={handleAddNote} disabled={!newNote.title.trim()}>Add Note</Button>
+                <Button onClick={handleAddNote} disabled={!newNote.title.trim() || isPending}>
+                  {isPending ? "Saving..." : "Add Note"}
+                </Button>
               </DialogClose>
             </DialogFooter>
           </div>
