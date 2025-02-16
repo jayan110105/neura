@@ -4,14 +4,9 @@ import { Button } from "~/components/ui/button";
 import { Card } from "~/components/ui/card";
 import { Brain } from "lucide-react";
 import { FaGithub } from "react-icons/fa";
-import { signIn} from "next-auth/react";
+import { signIn } from "next-auth/react"
 
 export default function LoginPage() {
-
-  const handleSignIn = async () => {
-    await signIn("google", { callbackUrl: "/chat" }); // ✅ Redirect to /dashboard after sign-in
-  };
-
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4">
@@ -32,7 +27,7 @@ export default function LoginPage() {
           <Button
             variant="outline"
             className="w-full py-6"
-            onClick={handleSignIn}
+            onClick={() => signIn("google", { callbackUrl: "/chat" })}
           >
             <FaGithub  className="mr-2 h-5 w-5" />
             Continue with GitHub
@@ -51,7 +46,7 @@ export default function LoginPage() {
 
           <Button
             className="w-full py-6"
-            onClick={handleSignIn}
+            onClick={() => signIn("google", { callbackUrl: "/chat" })}
           >
             Continue with Google
           </Button>

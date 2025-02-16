@@ -4,33 +4,65 @@ import type { Message } from "ai";
 import { z } from "zod";
 import { google as googleApis } from "googleapis";
 import { NextResponse } from "next/server";
-import { auth } from "auth";
+import { auth } from "~/server/auth";
+import { db } from "~/server/db";
+import { eq } from "drizzle-orm";
+import { accounts } from "~/server/db/schema"; 
 
 // Function to fetch email content using Gmail API
 async function fetchEmail() {
   const session = await auth();
 
-  if (!session?.access_token) {
+  if (!session?.user?.id) {
     console.log("Unauthorized Access");
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
+  const account = await db.query.accounts.findFirst({
+    where: eq(accounts.userId, session.user.id),
+  });
+
+  if (!account?.access_token) {
+    return new Response(JSON.stringify({ error: "No access token found" }), { status: 401 });
+  }
+
+  const accessToken = account.access_token;
+
+  console.log("Access Token: ", accessToken);
+
   // Set up OAuth2 client with user's access token
   const authClient = new googleApis.auth.OAuth2();
-  authClient.setCredentials({ access_token: session.access_token });
+  authClient.setCredentials({ access_token: accessToken });
+
+  console.log("Invoked ");
 
   const gmail = googleApis.gmail({ version: "v1", auth: authClient });
 
-  const messagesList = await gmail.users.messages.list({
-    userId: "me",
-    maxResults: 5,
-    q: "is:unread category:primary -from:linkedin.com",
-  });
+  console.log("Invoked2 ");
 
+  let messagesList;
+
+  try {
+
+    console.log("Before calling Gmail API for messages list");
+    messagesList = await gmail.users.messages.list({
+      userId: "me",
+      maxResults: 5,
+      q: "is:unread category:primary -from:linkedin.com",
+    });
+    console.log("After calling Gmail API, response: ", messagesList.data);
+  } catch (error) {
+    console.error("Error fetching email list: ", error);
+    return new Response(JSON.stringify({ error: "Failed to fetch emails", details: error.message }), { status: 500 });
+  }
+
+  console.log("Invoked3 ");
 
   if (!messagesList.data.messages) {
     return "No emails found.";
   }
+
+  console.log("Reached ", accessToken);
 
   const emailSummaries = [];
 
@@ -57,7 +89,7 @@ async function fetchEmail() {
     emailSummaries.push(emailContent || "No content found.");
   }
 
-  // console.log(emailSummaries);
+  console.log(emailSummaries);
 
   return emailSummaries.join("\n\n");
 }
