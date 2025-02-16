@@ -1,5 +1,5 @@
 import { google } from "@ai-sdk/google";
-import { streamText, tool } from "ai";
+import { streamText, tool, generateObject } from "ai";
 import type { Message } from "ai";
 import { z } from "zod";
 import { google as googleApis } from "googleapis";
@@ -8,9 +8,44 @@ import { auth } from "~/server/auth";
 import { db } from "~/server/db";
 import { eq } from "drizzle-orm";
 import { accounts } from "~/server/db/schema"; 
-import { getNotes } from "~/server/actions/note";
+import { getNotes, addNote } from "~/server/actions/note";
+import { v4 as uuidv4 } from "uuid";
 
 // Function to fetch email content using Gmail API
+const CategorySchema = z.object({
+  category: z.enum(["work", "personal", "ideas", "tasks"]).describe("The assigned category for the note."),
+});
+
+const TagsSchema = z.object({
+  tags: z.array(z.string()).min(1).max(5).describe("A list of relevant keywords for the note."),
+});
+
+// Function to categorize a note using structured AI output
+export async function categorizeNote(content: string): Promise<"work" | "personal" | "ideas" | "tasks"> {
+  const response = await generateObject({
+    model: google("gemini-2.0-flash"),
+    schema: CategorySchema,
+    system: `Analyze the provided note content and categorize it into one of the following: "work", "personal", "ideas", or "tasks".
+    Return a structured JSON object matching this schema.`,
+    messages: [{ role: "user", content }],
+  });
+
+  return response.object.category;
+}
+
+// Function to generate structured tags based on note content
+export async function generateTags(content: string): Promise<string[]> {
+  const response = await generateObject({
+    model: google("gemini-2.0-flash"),
+    schema: TagsSchema,
+    system: `Extract between 1 to 5 relevant keywords that best describe the provided note content.
+    Return a structured JSON object matching this schema.`,
+    messages: [{ role: "user", content }],
+  });
+
+  return response.object.tags;
+}
+
 async function fetchEmail() {
   const session = await auth();
 
@@ -112,24 +147,64 @@ const readNotes = tool({
   },
 });
 
+export const createNote = tool({
+  description: "Create a new note and store it in the database.",
+  parameters: z.object({
+    title: z.string().describe("The title of the note for quick reference."),
+    content: z.string().describe("The main body of the note containing detailed information."),
+  }),
+  execute: async ({title, content}) => {
+    const session = await auth();
+
+    if (!session?.user?.id) {
+      console.log("Unauthorized Access");
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const id = uuidv4();
+    const createdById = session.user.id;
+
+    const category = await categorizeNote(content);
+    const tags = await generateTags(content);
+
+    await addNote({ id, title, content, createdById, tags, category });
+    return {
+      success: true,
+      message: "Note created successfully!",
+      category,
+      tags,
+    };
+  },
+});
+
 export async function POST(req: Request) {
   const { messages } = (await req.json()) as { messages: Array<Message> };
 
   const result = streamText({
     model: google("gemini-2.0-flash"),
-    system: `You are an efficient AI assistant designed to summarize key information.
-    
-    Your tasks:
-    1. Retrieve the last 5 emails using the "readEmail" tool.
-    2. Retrieve important notes using the "readNotes" tool.
-    3. Provide a concise summary of the retrieved emails, prioritizing important details.
-    4. If applicable, cross-reference the emails with existing notes to enhance the summary.
-    
-    Be structured, factual, and ensure clarity in your responses.`,
+    system: `You are an intelligent AI assistant designed to efficiently extract and summarize key information from emails and notes.
+      ### Your Responsibilities:
+      1. Retrieve the **last 5 emails** using the 'readEmail' tool.
+      2. Retrieve **relevant notes** stored in the database using the 'readNotes' tool.
+      3. Generate a **clear and concise summary** of the retrieved emails, highlighting important details such as:
+        - Key topics and decisions
+        - Actionable tasks
+        - Critical information
+      4. If applicable, **cross-reference** emails with existing notes to provide a more contextual and insightful summary.
+      5. Maintain a **structured, factual, and easy-to-read format** in your responses.
+
+      ### Formatting Guidelines:
+      - **Use bullet points or numbered lists** for clarity.
+      - **Keep summaries concise** while ensuring completeness.
+      - **Highlight action items** where necessary.
+
+      Your goal is to help users quickly grasp important information without unnecessary details. Be **precise, structured, and efficient** in your responses.
+      `, // Add a brief description of the system
     messages,
     tools: {
       readEmail,
       readNotes,
+      createNote,
     },
     maxSteps: 10,
   });
