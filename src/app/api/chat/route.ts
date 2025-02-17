@@ -149,7 +149,7 @@ const readNotes = tool({
   },
 });
 
-export const createNote = tool({
+const createNote = tool({
   description: "Create a new note and store it in the database.",
   parameters: z.object({
     title: z.string().describe("The title of the note for quick reference."),
