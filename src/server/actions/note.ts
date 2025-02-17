@@ -21,4 +21,6 @@ export async function addNote(note: typeof notes.$inferInsert) {
 
 export async function deleteNote(noteId: string) {
   await db.delete(notes).where(eq(notes.id, noteId));
+
+  revalidatePath("/notes"); 
 }

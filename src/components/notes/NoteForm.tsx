@@ -10,7 +10,6 @@ import { Textarea } from "~/components/ui/textarea";
 import { Badge } from "~/components/ui/badge";
 import { Plus, X } from "lucide-react";
 import { v4 as uuidv4 } from "uuid";
-import { revalidatePath } from "next/cache";
 
 interface NoteFormProps {
   userId: string;
@@ -56,7 +55,6 @@ export default function NoteForm({ userId }: NoteFormProps) {
     startTransition(async () => {
       await addNote(note);
       setNewNote({ title: "", content: "", tags: [], category: "work" });
-      revalidatePath("/notes");
     });
   };
 
