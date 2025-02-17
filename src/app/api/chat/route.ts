@@ -142,7 +142,9 @@ const readNotes = tool({
   description: "Fetch all notes from the database, ordered by creation date.",
   parameters: z.object({}),
   execute: async () => {
-    const allNotes = getNotes();
+    const session = await auth();
+
+    const allNotes = getNotes(session?.user.id ?? "");
     return allNotes;
   },
 });

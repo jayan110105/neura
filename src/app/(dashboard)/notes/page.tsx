@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useTransition } from "react";
-import { getNotes, addNote } from "~/server/actions/note"
+import { getNotes, addNote, deleteNote } from "~/server/actions/note"
 import { ScrollArea } from "~/components/ui/scroll-area";
 import { Input } from "~/components/ui/input";
 import { Button } from "~/components/ui/button";
@@ -10,7 +10,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, Dialog
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "~/components/ui/select";
 import { Textarea } from "~/components/ui/textarea";
 import { Badge } from "~/components/ui/badge";
-import { Search, Plus, Filter, SortDesc, Tag, X } from "lucide-react";
+import { Search, Plus, Filter, SortDesc, Tag, X, Trash2 } from "lucide-react";
 import { format } from "date-fns";
 import { v4 as uuidv4 } from "uuid";
 import { useSession } from "next-auth/react"
@@ -52,14 +52,22 @@ export default function NotesPage() {
 
   useEffect(() => {
     async function fetchNotes() {
-      const notesFromDb = await getNotes();
+      const notesFromDb = await getNotes(session?.user.id ?? "");
       setNotes(notesFromDb);
     }
     fetchNotes().catch((error) => {
       console.error("Failed to fetch notes:", error);
     });
 
-  }, []);
+  }, [session?.user.id]);
+
+  const handleDeleteNote = async (noteId: string) => {
+    startTransition(async () => {
+      await deleteNote(noteId);
+      const updatedNotes = await getNotes(session?.user.id ?? "");
+      setNotes(updatedNotes);
+    });
+  };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter" && tagInput.trim() !== "") {
@@ -104,7 +112,7 @@ export default function NotesPage() {
     startTransition(async () => {
       await addNote(note);
       setNewNote({ title: "", content: "", tags: [], category: "work" });
-      const updatedNotes = await getNotes();
+      const updatedNotes = await getNotes(session?.user.id ?? "");
       setNotes(updatedNotes);
     });
     // setDialogOpen(false);
@@ -143,9 +151,16 @@ export default function NotesPage() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {filteredNotes.map((note) => (
             <Card key={note.id} className="p-4 hover:shadow-md transition-shadow">
-              <div className="flex items-center gap-2 mb-2">
-                <div className={`w-2 h-2 rounded-full ${categoryColors[note.category]}`} />
-                <h3 className="font-semibold">{note.title}</h3>
+              <div className="flex items-center gap-2 mb-2 justify-between">
+                <div className="flex items-center gap-2">
+                  <div className={`w-2 h-2 rounded-full ${categoryColors[note.category]}`} />
+                  <h3 className="font-semibold">{note.title}</h3>
+                </div>
+                <div>
+                  <Button variant="ghost" onClick={() => handleDeleteNote(note.id)}>
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </div>
               </div>
               <p className="text-sm text-muted-foreground mb-4">{note.content}</p>
               <div className="flex flex-wrap gap-2 mb-3">
