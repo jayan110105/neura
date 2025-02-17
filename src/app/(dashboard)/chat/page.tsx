@@ -8,6 +8,8 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "~/comp
 import { ArrowUp, Save, CalendarPlus, Star, Brain, Lightbulb, Sparkles } from "lucide-react";
 import { cn } from "~/lib/utils";
 import { useChat } from "@ai-sdk/react";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 
 const quickPrompts = [
   { icon: Brain, text: "Summarize my recent notes" },
@@ -35,7 +37,7 @@ export default function ChatPage() {
                 "px-6 py-3 max-w-[80%]",
                 message.role === 'user' ? "rounded-full bg-primary text-primary-foreground" : "border-none shadow-none bg-card"
               )}>
-                <p>{message.content}</p>
+                <ReactMarkdown remarkPlugins={[remarkGfm]}>{message.content}</ReactMarkdown>
                 {message.role === 'assistant' && (
                   <div className="mt-2 flex items-center">
 

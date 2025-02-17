@@ -14,6 +14,8 @@ import { Search, Plus, Filter, SortDesc, Tag, X, Trash2 } from "lucide-react";
 import { format } from "date-fns";
 import { v4 as uuidv4 } from "uuid";
 import { useSession } from "next-auth/react"
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 
 interface Note {
   id: string;
@@ -162,7 +164,8 @@ export default function NotesPage() {
                   </Button>
                 </div>
               </div>
-              <p className="text-sm text-muted-foreground mb-4">{note.content}</p>
+              <ReactMarkdown className="text-sm text-muted-foreground mb-4" remarkPlugins={[remarkGfm]}>{note.content}</ReactMarkdown>
+              {/* <p className="text-sm text-muted-foreground mb-4">{note.content}</p> */}
               <div className="flex flex-wrap gap-2 mb-3">
                 {note.tags.map((tag) => (
                   <div
