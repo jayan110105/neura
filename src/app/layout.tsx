@@ -7,8 +7,8 @@ import { SessionProvider } from "next-auth/react";
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: 'Knowledge Hub - Personal Knowledge Management',
-  description: 'A modern chat-based personal knowledge management system',
+  title: 'Neura - AI-Powered Assistant',
+  description: 'An AI assistant that helps you stay organized and productive.',
 };
 
 export default function RootLayout({

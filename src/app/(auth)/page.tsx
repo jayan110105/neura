@@ -2,7 +2,7 @@
 
 import { Button } from "~/components/ui/button";
 import { Card } from "~/components/ui/card";
-import { MessageSquare, Calendar, Mail, CheckSquare, ArrowRight, Brain } from "lucide-react";
+import { MessageSquare, Calendar, Mail, CheckSquare, ArrowRight, Sparkles } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 const features = [
@@ -37,14 +37,14 @@ export default function HomePage() {
       <div className="container mx-auto px-4 py-16 text-center">
         <div className="flex justify-center mb-8">
           <div className="bg-primary rounded-full p-4">
-            <Brain className="h-8 w-8 text-primary-foreground" />
+            <Sparkles className="h-8 w-8 text-primary-foreground" />
           </div>
         </div>
         <h1 className="text-4xl md:text-6xl font-bold mb-6">
-          Your Personal Knowledge Hub
+          Your AI Powered Assitant
         </h1>
         <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
-          Transform the way you manage information with our AI-powered knowledge management system
+        Stay organized and productive with intelligent support at your fingertips
         </p>
         <div className="flex gap-4 justify-center mb-16">
           <Button size="lg" onClick={() => router.push("/login")}>
