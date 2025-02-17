@@ -89,7 +89,7 @@ export default function ChatPage() {
       </ScrollArea>
 
       {/* Input Area */}
-      <div className="bg-white  sticky bottom-0">
+      <div className="bg-white  sticky bottom-0 px-4 mb-4">
         <div className="max-w-4xl mx-auto border rounded-xl">
           <form onSubmit={handleSubmit} className="flex items-end p-2">
             <div className="flex-1">
@@ -119,7 +119,7 @@ export default function ChatPage() {
         </div>
 
         {/* Quick Actions Bar */}
-        <div className="max-w-4xl mx-auto flex items-center gap-4 mt-4 mb-4">
+        <div className="max-w-4xl mx-auto hidden md:flex flex-wrap items-center gap-4 mt-4 mb-4 w-full justify-center">
           {quickPrompts.map((prompt, index) => (
             <Button
               key={index}

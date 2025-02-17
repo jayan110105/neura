@@ -10,9 +10,9 @@ export default function DashboardLayout({
   return (
     <SidebarProvider>
       <AppSidebar />
-      <div className="flex flex-1">
+      <div className="flex flex-col flex-1">
         <ConditionalSidebarTrigger />
-        <div className="flex-1">
+        <div className="flex-1 items-end">
           {children}
         </div>
       </div>

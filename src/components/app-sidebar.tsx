@@ -12,6 +12,13 @@ import {
   SidebarTrigger
 } from "~/components/ui/sidebar"
 
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "~/components/ui/tooltip"
+
 // Menu items.
 const items = [
   {
@@ -46,17 +53,26 @@ export function AppSidebar() {
     <Sidebar>
       <SidebarContent>
         <SidebarHeader>
-          <SidebarTrigger />
+          <TooltipProvider delayDuration={100} skipDelayDuration={0}>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <SidebarTrigger className="[&_svg]:size-6"/>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Close sidebar</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
         </SidebarHeader>
         <SidebarGroup>
           <SidebarGroupContent>
             <SidebarMenu>
               {items.map((item) => (
-                <SidebarMenuItem key={item.title}>
+                <SidebarMenuItem key={item.title} className="ml-2">
                   <SidebarMenuButton className="gap-2.5" asChild>
                     <a href={item.url} >
-                      <item.icon className="h-6 w-6"/>
-                      <span className="text-sm">{item.title}</span>
+                      <item.icon className="!h-5 !w-5 mr-1"/>
+                      <span className="text-base">{item.title}</span>
                     </a>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
