@@ -21,7 +21,7 @@ const TagsSchema = z.object({
 });
 
 // Function to categorize a note using structured AI output
-export async function categorizeNote(content: string): Promise<"work" | "personal" | "ideas" | "tasks"> {
+async function categorizeNote(content: string): Promise<"work" | "personal" | "ideas" | "tasks"> {
   const response = await generateObject({
     model: google("gemini-2.0-flash"),
     schema: CategorySchema,
@@ -34,7 +34,7 @@ export async function categorizeNote(content: string): Promise<"work" | "persona
 }
 
 // Function to generate structured tags based on note content
-export async function generateTags(content: string): Promise<string[]> {
+async function generateTags(content: string): Promise<string[]> {
   const response = await generateObject({
     model: google("gemini-2.0-flash"),
     schema: TagsSchema,
