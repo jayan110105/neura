@@ -1,11 +1,28 @@
-// components/NotesList.tsx (Server Component)
-import { getNotes } from "~/server/actions/note";
+"use client"
+
 import { Card } from "~/components/ui/card";
 import { format } from "date-fns";
 import { Tag} from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
-import DeleteNoteButton from "./DeleteNoteButton";
+import { useState } from "react";
+import { Input } from "~/components/ui/input";
+import { Button } from "~/components/ui/button";
+import { Search, Filter, SortDesc } from "lucide-react";
+import { ScrollArea } from "~/components/ui/scroll-area";
+import { deleteNote } from "~/server/actions/note";
+import { Trash2 } from "lucide-react";
+import NoteForm from "~/components/notes/NoteForm";
+
+interface Note {
+  id: string;
+  title: string;
+  content: string;
+  createdById: string;
+  createdAt: Date;
+  tags: string[];
+  category: 'work' | 'personal' | 'ideas' | 'tasks';
+}
 
 const categoryColors = {
   work: "bg-blue-500",
@@ -15,53 +32,88 @@ const categoryColors = {
 };
 
 
-export default async function NotesList({ userId, searchQuery }: { userId: string; searchQuery : string }) {
-  let notes = await getNotes(userId);
+export default function NotesList({ userId, initialNotes }: { userId: string; initialNotes: Note[] }) {
 
-  if (searchQuery) {
-    const lowerQuery = searchQuery.toLowerCase();
-    notes = notes.filter(
-      (note) =>
-        note.title.toLowerCase().includes(lowerQuery) ||
-        note.tags.some((tag) => tag.toLowerCase().includes(lowerQuery))
-    );
+  const [notes, setNotes] = useState(initialNotes);
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const handleNoteAdded = (newNote: Note) => {
+    setNotes((prev) => [newNote, ...prev]); // Add the new note instantly to the list
   }
 
-  if (!notes.length) {
-    return <p className="text-center text-muted-foreground">No notes found.</p>;
-  }
+  const handleDelete = async (noteId: string) => {
+    setNotes((prev) => prev.filter((note) => note.id !== noteId));
+    await deleteNote(noteId);
+  };
+
+  const filteredNotes = notes.filter(
+    (note) =>
+      note.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      note.tags.some((tag) => tag.toLowerCase().includes(searchQuery.toLowerCase()))
+  );
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {notes.map((note) => (
-        <Card key={note.id} className="p-4 hover:shadow-md transition-shadow">
-            <div className="flex items-center gap-2 mb-2 justify-between">
-            <div className="flex items-center gap-2">
-                <div className={`w-2 h-2 rounded-full ${categoryColors[note.category]}`} />
-                <h3 className="font-semibold">{note.title}</h3>
-            </div>
-            <div>
-              <DeleteNoteButton noteId={note.id}/>
-            </div>
-            </div>
-            <ReactMarkdown className="text-sm text-muted-foreground mb-4" remarkPlugins={[remarkGfm]}>{note.content}</ReactMarkdown>
-            {/* <p className="text-sm text-muted-foreground mb-4">{note.content}</p> */}
-            <div className="flex flex-wrap gap-2 mb-3">
-            {note.tags.map((tag) => (
-                <div
+    <>
+      <div className="p-4 border-b bg-card">
+          <div className="flex items-center gap-4 mb-4">
+              <div className="relative flex-1">
+              <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+              <Input 
+                  placeholder="Search notes..." 
+                  className="pl-8" 
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+              />
+              </div>
+              <Button variant="outline">
+                  <Filter className="h-4 w-4 mr-2" />
+                  Filters
+              </Button>
+              <Button variant="outline">
+                  <SortDesc className="h-4 w-4 mr-2" />
+                  Sort
+              </Button>
+          </div>
+      </div>
+      <ScrollArea className="flex-1 p-4">
+        {filteredNotes.length === 0 ? (
+          <p className="text-center text-muted-foreground">No notes found.</p>
+        ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {filteredNotes.map((note) => (
+            <Card key={note.id} className="p-4 hover:shadow-md transition-shadow">
+              <div className="flex items-center gap-2 mb-2 justify-between">
+                <div className="flex items-center gap-2">
+                  <div className={`w-2 h-2 rounded-full ${categoryColors[note.category]}`} />
+                  <h3 className="font-semibold">{note.title}</h3>
+                </div>
+                <div>
+                  <Button variant="ghost" onClick={() => handleDelete(note.id)}>
+                      <Trash2 className="h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
+              <ReactMarkdown className="text-sm text-muted-foreground mb-4" remarkPlugins={[remarkGfm]}>{note.content}</ReactMarkdown>
+              <div className="flex flex-wrap gap-2 mb-3">
+                {note.tags.map((tag) => (
+                  <div
                     key={tag}
                     className="flex items-center bg-secondary px-2 py-1 rounded-full text-xs"
-                >
-                <Tag className="h-3 w-3 mr-1" />
-                {tag}
-                </div>
-            ))}
-            </div>
-            <div className="text-xs text-muted-foreground">
+                  >
+                    <Tag className="h-3 w-3 mr-1" />
+                    {tag}
+                  </div>
+                ))}
+              </div>
+              <div className="text-xs text-muted-foreground">
                 {format(new Date(note.createdAt), 'MMM d, yyyy HH:mm')}
-            </div>
-        </Card>
-        ))}
-    </div>
+              </div>
+            </Card>
+          ))}
+        </div>
+        )}
+      </ScrollArea>
+      <NoteForm userId={userId} onNoteAdded={handleNoteAdded}/>
+    </>
   );
 }

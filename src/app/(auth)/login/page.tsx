@@ -2,7 +2,7 @@
 
 import { Button } from "~/components/ui/button";
 import { Card } from "~/components/ui/card";
-import { Brain } from "lucide-react";
+import { Sparkles } from "lucide-react";
 import { FaGithub } from "react-icons/fa";
 import { signIn } from "next-auth/react"
 
@@ -14,12 +14,12 @@ export default function LoginPage() {
         <div className="text-center mb-8">
           <div className="flex justify-center mb-4">
             <div className="bg-primary rounded-full p-3">
-              <Brain className="h-6 w-6 text-primary-foreground" />
+              <Sparkles className="h-6 w-6 text-primary-foreground" />
             </div>
           </div>
           <h1 className="text-2xl font-bold mb-2">Welcome Back</h1>
           <p className="text-muted-foreground">
-            Sign in to access your knowledge hub
+            Sign in to access your AI assistant
           </p>
         </div>
 

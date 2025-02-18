@@ -2,7 +2,7 @@
 
 import { db } from "~/server/db";
 import { notes } from "~/server/db/schema"; // Adjust the import based on your project structure
-import { eq } from "drizzle-orm";
+import { eq, desc } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 
 export async function getNotes(userId: string) {
@@ -10,7 +10,7 @@ export async function getNotes(userId: string) {
     .select()
     .from(notes)
     .where(eq(notes.createdById, userId)) // Filter by userId
-    .orderBy(notes.createdAt);
+    .orderBy(desc(notes.createdAt));
 }
 
 export async function addNote(note: typeof notes.$inferInsert) {

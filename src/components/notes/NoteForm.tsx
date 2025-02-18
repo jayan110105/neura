@@ -11,11 +11,22 @@ import { Badge } from "~/components/ui/badge";
 import { Plus, X } from "lucide-react";
 import { v4 as uuidv4 } from "uuid";
 
-interface NoteFormProps {
-  userId: string;
+interface Note {
+  id: string;
+  title: string;
+  content: string;
+  createdById: string;
+  createdAt: Date;
+  tags: string[];
+  category: 'work' | 'personal' | 'ideas' | 'tasks';
 }
 
-export default function NoteForm({ userId }: NoteFormProps) {
+interface NoteFormProps {
+  userId: string;
+  onNoteAdded: (note: Note) => void;
+}
+
+export default function NoteForm({ userId, onNoteAdded }: NoteFormProps) {
   const [newNote, setNewNote] = useState({
     title: "",
     content: "",
@@ -51,6 +62,8 @@ export default function NoteForm({ userId }: NoteFormProps) {
       tags: newNote.tags,
       category: newNote.category as "work" | "personal" | "ideas" | "tasks",
     };
+
+    onNoteAdded(note);
 
     startTransition(async () => {
       await addNote(note);
