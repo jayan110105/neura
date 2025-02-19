@@ -21,19 +21,6 @@ export async function DELETE() {
   return NextResponse.json({ success: true });
 }
 
-export async function GET() {
-
-  const session = await auth();
-
-  if (!session?.user?.id) throw new Error("Unauthorized");
-
-  const userId = session.user.id; // Replace with actual user session ID
-
-  const chat = await db.select().from(chats).where(eq(chats.userId, userId)).limit(1);
-
-  return NextResponse.json(chat.length && chat[0]?.messages ? JSON.parse(chat[0].messages) : []);
-}
-
 export async function POST(req: Request) {
 
   const session = await auth();

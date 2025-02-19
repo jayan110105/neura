@@ -1,5 +1,6 @@
 import { type Config } from "tailwindcss";
 import { fontFamily } from "tailwindcss/defaultTheme";
+import tailwindcssAnimate from "tailwindcss-animate";
 
 export default {
     darkMode: ["class"],
@@ -68,8 +69,17 @@ export default {
   				border: 'hsl(var(--sidebar-border))',
   				ring: 'hsl(var(--sidebar-ring))'
   			}
-  		}
+  		},
+		  keyframes: {
+			'grow-shrink': {
+			  '0%, 100%': { transform: 'scale(1)', opacity: '1' },
+			  '50%': { transform: 'scale(1.2)', opacity: '0.7' },
+			},
+		  },
+		  animation: {
+			'grow-shrink': 'grow-shrink 1.4s ease-in-out infinite',
+		  },
   	}
   },
-  plugins: [require("tailwindcss-animate")],
+  plugins: [tailwindcssAnimate],
 } satisfies Config;

@@ -32,8 +32,8 @@ export default function ChatPage({ initialMessages }: ChatPageProps) {
 
   useEffect(() => {
     const handleReset = async () => {
-      await fetch("/api/chat", { method: "DELETE" }); // Clear DB
       setMessages([]); // Clear UI
+      await fetch("/api/chat", { method: "DELETE" }); // Clear DB
     };
 
     window.addEventListener("reset-chat", () => {
@@ -46,6 +46,7 @@ export default function ChatPage({ initialMessages }: ChatPageProps) {
       });
     };
   }, [setMessages]);
+
 
   return (
     <div className="h-full flex flex-col">
@@ -64,8 +65,14 @@ export default function ChatPage({ initialMessages }: ChatPageProps) {
                 "px-6 py-3 max-w-[80%]",
                 message.role === 'user' ? "rounded-full bg-primary text-primary-foreground" : "border-none shadow-none bg-card"
               )}>
-                <ReactMarkdown remarkPlugins={[remarkGfm]}>{message.content}</ReactMarkdown>
-                {message.role === 'assistant' && (
+                {message.content ? (
+                  <ReactMarkdown remarkPlugins={[remarkGfm]}>{message.content}</ReactMarkdown>
+                ) : (
+                  message.role === "assistant" && (
+                    <div className="w-5 h-5 bg-black rounded-full animate-grow-shrink"></div>
+                  )
+                )}
+                {message.content && message.role === 'assistant' && (
                   <div className="mt-2 flex items-center">
 
                     <TooltipProvider delayDuration={100} skipDelayDuration={0}>
