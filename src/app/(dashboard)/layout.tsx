@@ -12,6 +12,7 @@ export default async function DashboardLayout({
   children,
 }: {
   children: React.ReactNode;
+  params: { slug?: string[] };
 }) {
   const session = await auth();
 
@@ -25,7 +26,6 @@ export default async function DashboardLayout({
     // Fetch user from DB using authenticated user's ID
     const user = await db.select().from(users).where(eq(users.id, session.user.id)).limit(1);
     userData = user[0] ?? null;
-    console.log(userData?.image);
   }
 
   return (

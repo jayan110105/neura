@@ -10,6 +10,8 @@ import { cn } from "~/lib/utils";
 import { useChat } from "@ai-sdk/react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import { useEffect } from "react";
+import type { Message } from "ai";
 
 const quickPrompts = [
   { icon: Brain, text: "Summarize my recent notes" },
@@ -18,16 +20,44 @@ const quickPrompts = [
 ];
 
 export default function ChatPage() {
-  const { messages, input, handleInputChange, handleSubmit, append } = useChat();
+  const { messages, input, handleInputChange, handleSubmit, append, setMessages  } = useChat();
+
+  useEffect(() => {
+    console.log("INITIAL LOAD");
+    async function loadMessages() {
+      const res = await fetch("/api/chat");
+      const data: Message[] = await res.json() as Message[];
+      console.log(data);
+      setMessages(data);
+    }
+    loadMessages().catch(console.error);
+  }, [setMessages]);
+
+  useEffect(() => {
+    const handleReset = async () => {
+      await fetch("/api/chat", { method: "DELETE" }); // Clear DB
+      setMessages([]); // Clear UI
+    };
+
+    window.addEventListener("reset-chat", () => {
+      handleReset().catch(console.error);
+    });
+
+    return () => {
+      window.removeEventListener("reset-chat", () => {
+        handleReset().catch(console.error);
+      });
+    };
+  }, [setMessages]);
 
   return (
     <div className="h-full flex flex-col">
       {/* Chat Area */}
       <ScrollArea className="flex-1 p-4">
         <div className="space-y-4 max-w-3xl mx-auto">
-          {messages.map((message) => (
+          {messages.map((message, index) => (
             <div
-              key={message.id}
+              key={message.id ?? `message-${index}`}
               className={cn(
                 "flex flex-col",
                 message.role === 'user' ? "items-end" : "items-start"

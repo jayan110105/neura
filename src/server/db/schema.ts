@@ -20,6 +20,27 @@ import { type AdapterAccount } from "next-auth/adapters";
 
 export const createTable = pgTableCreator((name) => `neura_${name}`);
 
+export const chats = createTable(
+  "chats",
+  {
+    id: integer("id").primaryKey().generatedByDefaultAsIdentity(),
+    userId: varchar("user_id", { length: 255 })
+      .notNull()
+      .unique() 
+      .references(() => users.id, { onDelete: "cascade" }),
+    messages: text("messages").notNull(), // Store messages as a JSON string
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .default(sql`CURRENT_TIMESTAMP`)
+      .notNull(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).$onUpdate(
+      () => new Date()
+    ),
+  },
+  (chat) => ({
+    userIdIdx: index("user_id_idx").on(chat.userId),
+  })
+);
+
 export const posts = createTable(
   "post",
   {
