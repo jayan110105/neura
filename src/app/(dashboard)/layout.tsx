@@ -30,11 +30,15 @@ export default async function DashboardLayout({
 
   return (
     <SidebarProvider>
-      <AppSidebar />
+      <AppSidebar user={{
+          name: userData?.name ?? "Guest",
+          email: userData?.email ?? "guest@example.com",
+          avatar: userData?.image ?? "/default-avatar.png",
+        }} />
       <div className="flex flex-col flex-1">
         <div className="flex justify-between">
           <div>{ConditionalSidebarTrigger ? <ConditionalSidebarTrigger /> : null}</div>
-          <div>
+          <div className="hidden sm:flex">
             <NavUser user={{
                 name: userData?.name ?? "Guest",
                 email: userData?.email ?? "guest@example.com",

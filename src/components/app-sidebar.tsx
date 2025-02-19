@@ -5,13 +5,14 @@ import { CheckSquare, MessageSquare, FileText, CalendarIcon, Mail, RefreshCw } f
 import {
   Sidebar,
   SidebarContent,
+  SidebarFooter,
   SidebarGroup,
   SidebarGroupContent,
   SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-  SidebarTrigger
+  SidebarTrigger,
 } from "~/components/ui/sidebar"
 
 import { Button } from "~/components/ui/button"
@@ -24,6 +25,7 @@ import {
 } from "~/components/ui/tooltip"
 
 import { usePathname } from "next/navigation";
+import { NavMobile } from "./nav-mobile"
 
 // Menu items.
 const items = [
@@ -54,7 +56,15 @@ const items = [
   },
 ]
 
-export function AppSidebar() {
+export function AppSidebar({
+  user,
+}: {
+  user: {
+    name: string
+    email: string
+    avatar: string
+  }
+}) {
 
   const pathname = usePathname();
 
@@ -113,6 +123,9 @@ export function AppSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
+      <SidebarFooter className="flex sm:hidden">
+        <NavMobile user={user}/>
+      </SidebarFooter>
     </Sidebar>
   )
 }
