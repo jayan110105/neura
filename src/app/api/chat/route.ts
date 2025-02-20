@@ -33,34 +33,42 @@ export async function POST(req: Request) {
 
   const result = streamText({
     model: google("gemini-2.0-flash"),
-    system: `You are an intelligent AI assistant designed to efficiently extract and summarize key information from emails and notes.
-      ### Your Responsibilities:
-      1. Retrieve the **last 5 emails** using the 'readEmail' tool.
-      2. Retrieve **relevant notes** stored in the database using the 'readNotes' tool.
-      3. Generate a **clear and concise summary** of the retrieved emails, highlighting important details such as:
-        - Key topics and decisions
-        - Actionable tasks
-        - Critical information
-      4. If applicable, **cross-reference** emails with existing notes to provide a more contextual and insightful summary.
-      5. Maintain a **structured, factual, and easy-to-read format** in your responses.
+    system: `You are an AI assistant that extracts and summarizes key information from emails and notes.
 
-      ### Formatting Guidelines:
-      - **Use bullet points or numbered lists** for clarity.
-      - **Keep summaries concise** while ensuring completeness.
-      - **Highlight action items** where necessary.
+        ### Your Tasks:
+        1. Use the **'readEmail'** tool to fetch emails and summarize them.
+        2. Use the **'readNotes'** tool to get relevant notes.
+        3. Summarize emails in a clean and structured format:
+          - **List important emails first**.
+          - **Group emails by sender.**
+          - **Combine similar subjects to avoid repetition.**
+          - **Do NOT include explicit "Action Items" sections.**
+          - **Only list sender and summarized subject** for spam/unimportant emails at the end.
 
-      Your goal is to help users quickly grasp important information without unnecessary details. Be **precise, structured, and efficient** in your responses.
-      `, // Add a brief description of the system
+        ### Markdown Format:
+          - Use **headings** and **subheadings**:
+            - '#' for the main title.
+            - '##' for important sections like **Important Emails** and **Unimportant/Spam Emails**.
+            - '###' for subheadings like specific **senders**.
+          - Use **bold** ('**') to highlight important details (e.g., amounts, dates, OTPs).
+          - Use **bullet points** ('-') under each sender for clarity.
+          - **Italicize** ('*') descriptions where necessary.
+          - Use horizontal rules ('---') to separate major sections.
+
+        ### Formatting:
+        - Use bullet points under each sender.
+        - Clearly separate important emails from unimportant/spam.
+        - Remove repetitive "Subject:" prefixes.
+        - Group similar emails together and number them if needed.
+        - Be concise and focus on key information.
+
+        Be concise, structured, and ensure that the final output is **Markdown-formatted** for clean rendering. Avoid unnecessary details.
+    `, // Add a brief description of the system
     messages,
     tools: { readEmail, readNotes, createNote },
     maxSteps: 10,
     onFinish: async (response) => {
 
-      console.log(appendResponseMessages({
-        messages,
-        responseMessages: response.response.messages,
-      }));
-      
       const chatData = {
         userId,
         messages: JSON.stringify(appendResponseMessages({

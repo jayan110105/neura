@@ -1,6 +1,7 @@
 import { type Config } from "tailwindcss";
 import { fontFamily } from "tailwindcss/defaultTheme";
 import tailwindcssAnimate from "tailwindcss-animate";
+import typography from "@tailwindcss/typography";
 
 export default {
     darkMode: ["class"],
@@ -79,7 +80,38 @@ export default {
 		  animation: {
 			'grow-shrink': 'grow-shrink 1.4s ease-in-out infinite',
 		  },
+		  typography: (theme: (path: string) => string) => ({
+			DEFAULT: {
+			  css: {
+				h1: {
+				  fontSize: theme('fontSize.2xl'),
+				  fontWeight: theme('fontWeight.bold'),
+				  marginBottom: theme('spacing.4'),
+				  marginTop: theme('spacing.0'),
+				},
+				h2: {
+				  fontSize: theme('fontSize.xl'),
+				  fontWeight: theme('fontWeight.semibold'),
+				  marginBottom: theme('spacing.2'),
+				  marginTop: theme('spacing.0'),
+				},
+				h3: {
+				  fontSize: theme('fontSize.lg'),
+				  fontWeight: theme('fontWeight.medium'),
+				  marginBottom: theme('spacing.1'),
+				  marginTop: theme('spacing.0'),
+				},
+				hr: {
+				  marginBottom: theme('spacing.2'),
+				  marginTop: theme('spacing.2'),
+				},
+				ul:{
+					marginBottom: theme('spacing.2'),
+				},
+			  },
+			},
+		}),
   	}
   },
-  plugins: [tailwindcssAnimate],
+  plugins: [tailwindcssAnimate, typography],
 } satisfies Config;

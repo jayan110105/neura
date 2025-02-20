@@ -66,7 +66,14 @@ export default function ChatPage({ initialMessages }: ChatPageProps) {
                 message.role === 'user' ? "rounded-full bg-primary text-primary-foreground" : "border-none shadow-none bg-card"
               )}>
                 {message.content ? (
-                  <ReactMarkdown remarkPlugins={[remarkGfm]}>{message.content}</ReactMarkdown>
+                  message.role === 'assistant' ? (
+                    // <p>{message.content}</p>
+                    <div className="prose">
+                      <ReactMarkdown remarkPlugins={[remarkGfm]}>{message.content}</ReactMarkdown>
+                    </div>
+                  ) : (
+                    <p>{message.content}</p>
+                  )
                 ) : (
                   message.role === "assistant" && (
                     <div className="w-5 h-5 bg-black rounded-full animate-grow-shrink"></div>
