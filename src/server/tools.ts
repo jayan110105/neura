@@ -2,14 +2,14 @@ import { tool} from "ai";
 import { z } from "zod";
 import { auth } from "~/server/auth";
 import { getNotes} from "~/server/actions/note";
-import { fetchEmail, mailParams } from "~/server/services/mail";
+import { fetchEmail, mailParams, summarizeEmail } from "~/server/services/mail";
 import { createNewNote } from "~/server/services/note";
 import { db } from "~/server/db";
 import { eq } from "drizzle-orm";
 import { accounts } from "~/server/db/schema"; 
 
 export const readEmail = tool({
-    description: "Fetches emails based on user-defined criteria",
+    description: "Fetches and summarizes emails based on user-defined criteria",
     parameters: z.object({
       userQuery: z.string().describe("Natural language query for fetching emails"),
     }),
@@ -55,7 +55,9 @@ export const readEmail = tool({
     }) : ["No emails found."];
 
     // Join all formatted emails into a single string
-    return formattedEmails.join("\n\n");
+    const summarized = summarizeEmail(formattedEmails.join("\n\n"));
+
+    return summarized;
     },
   });
   
