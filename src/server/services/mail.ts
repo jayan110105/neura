@@ -1,4 +1,4 @@
-import { gmail_v1, google as googleApis } from "googleapis";
+import { type gmail_v1, google as googleApis } from "googleapis";
 
 import { google } from "@ai-sdk/google";
 import { generateObject, generateText } from "ai";

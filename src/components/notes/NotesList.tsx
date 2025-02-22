@@ -8,11 +8,17 @@ import remarkGfm from "remark-gfm";
 import { useState } from "react";
 import { Input } from "~/components/ui/input";
 import { Button } from "~/components/ui/button";
-import { Search, Filter, SortDesc } from "lucide-react";
+import { Search, Filter } from "lucide-react";
 import { ScrollArea } from "~/components/ui/scroll-area";
 import { deleteNote } from "~/server/actions/note";
 import { Trash2 } from "lucide-react";
 import NoteForm from "~/components/notes/NoteForm";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuCheckboxItem,
+  DropdownMenuTrigger,
+} from "~/components/ui/dropdown-menu"
 
 interface Note {
   id: string;
@@ -36,6 +42,9 @@ export default function NotesList({ userId, initialNotes }: { userId: string; in
 
   const [notes, setNotes] = useState(initialNotes);
   const [searchQuery, setSearchQuery] = useState("");
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([])
+
+  const categories = ['work', 'personal', 'ideas', 'tasks'];
 
   const handleNoteAdded = (newNote: Note) => {
     setNotes((prev) => [newNote, ...prev]); // Add the new note instantly to the list
@@ -47,9 +56,13 @@ export default function NotesList({ userId, initialNotes }: { userId: string; in
   };
 
   const filteredNotes = notes.filter(
-    (note) =>
-      note.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      note.tags.some((tag) => tag.toLowerCase().includes(searchQuery.toLowerCase()))
+    (note) => {
+      const matchTitle = note.title.toLowerCase().includes(searchQuery.toLowerCase())
+      const matchTags = note.tags.some((tag) => tag.toLowerCase().includes(searchQuery.toLowerCase()))
+      const matchCategory = selectedCategories.length === 0 || selectedCategories.some((category) => note.category == category)
+
+      return (matchTitle || matchTags) && matchCategory ;
+    }  
   );
 
   return (
@@ -65,14 +78,29 @@ export default function NotesList({ userId, initialNotes }: { userId: string; in
                   onChange={(e) => setSearchQuery(e.target.value)}
               />
               </div>
-              <Button variant="outline">
-                  <Filter className="h-4 w-4 mr-2" />
-                  Filters
-              </Button>
-              <Button variant="outline">
-                  <SortDesc className="h-4 w-4 mr-2" />
-                  Sort
-              </Button>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline" className="gap-2">
+                    <Filter className="h-4 w-4" />
+                    <div className="hidden sm:flex">
+                      Filters
+                    </div>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-56">
+                  {categories.map((category) => (
+                    <DropdownMenuCheckboxItem
+                      key={category}
+                      checked={selectedCategories.includes(category)}
+                      onCheckedChange={(checked) => {
+                        setSelectedCategories(checked ? [...selectedCategories, category] : selectedCategories.filter((t) => t !== category))
+                      }}
+                    >
+                      {category}
+                    </DropdownMenuCheckboxItem>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
           </div>
       </div>
       <ScrollArea className="flex-1 p-4">
