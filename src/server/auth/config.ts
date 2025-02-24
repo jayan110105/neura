@@ -71,6 +71,8 @@ export const authConfig = {
         return session // Exit early if there's no refresh token
       }        
 
+      console.log("refresh_token", googleAccount.refresh_token);
+      
       if (googleAccount?.expires_at && googleAccount.expires_at * 1000 < Date.now()) {
         // If the access token has expired, try to refresh it
         try {

@@ -96,7 +96,10 @@ export default function NotesList({ userId, initialNotes }: { userId: string; in
                         setSelectedCategories(checked ? [...selectedCategories, category] : selectedCategories.filter((t) => t !== category))
                       }}
                     >
-                      {category}
+                      <div className="flex items-center gap-2">
+                        <div className={`w-2 h-2 rounded-full ${categoryColors[category as keyof typeof categoryColors]}`} />
+                        {category}
+                      </div>
                     </DropdownMenuCheckboxItem>
                   ))}
                 </DropdownMenuContent>

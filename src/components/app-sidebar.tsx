@@ -110,11 +110,11 @@ export function AppSidebar({
           <SidebarGroupContent>
             <SidebarMenu>
               {items.map((item) => (
-                <SidebarMenuItem key={item.title} className="ml-2">
-                  <SidebarMenuButton className="gap-2.5" asChild>
+                <SidebarMenuItem key={item.title} className="mx-2">
+                  <SidebarMenuButton className="gap-2.5 py-5" asChild>
                     <a href={item.url} >
-                      <item.icon className="!h-5 !w-5 mr-1"/>
-                      <span className="text-base">{item.title}</span>
+                      <item.icon className="!h-5 !w-5 mr-1 text-black"/>
+                      <span className="text-base text-black">{item.title}</span>
                     </a>
                   </SidebarMenuButton>
                 </SidebarMenuItem>

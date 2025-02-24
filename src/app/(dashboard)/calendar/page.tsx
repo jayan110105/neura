@@ -43,7 +43,7 @@ export default function CalendarPage() {
     },
   ]);
 
-  const [showSidebar, setShowSidebar] = useState(true);
+  const [showSidebar, setShowSidebar] = useState(false);
 
   return (
     <div className="h-full flex flex-col lg:grid lg:grid-cols-[300px_1fr] divide-y lg:divide-y-0 lg:divide-x">
