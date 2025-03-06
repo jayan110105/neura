@@ -109,16 +109,19 @@ export function AppSidebar({
         <SidebarGroup>
           <SidebarGroupContent>
             <SidebarMenu>
-              {items.map((item) => (
-                <SidebarMenuItem key={item.title} className="mx-2">
-                  <SidebarMenuButton className="gap-2.5 py-5" asChild>
-                    <a href={item.url} >
-                      <item.icon className="!h-5 !w-5 mr-1 text-black"/>
-                      <span className="text-base text-black">{item.title}</span>
-                    </a>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
+              {items.map((item) => {
+                const isActive = pathname === item.url;
+                return (
+                  <SidebarMenuItem key={item.title} className="mx-2">
+                    <SidebarMenuButton className="gap-2.5 py-5" asChild>
+                      <a href={item.url} className={isActive ? "text-black" : "text-gray-500"}>
+                        <item.icon className={`!h-5 !w-5 mr-1 ${isActive ? "text-black" : "text-gray-500"}`} />
+                        <span className={isActive ? "text-black" : "text-gray-500"}>{item.title}</span>
+                      </a>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                );
+              })}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
