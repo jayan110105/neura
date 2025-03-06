@@ -3,6 +3,7 @@ import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import { ThemeProvider } from "~/components/theme-provider";
 import { SessionProvider } from "next-auth/react";
+import Script from 'next/script'
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -18,6 +19,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" suppressHydrationWarning>
+      <head>
+        <Script src="https://unpkg.com/react-scan/dist/auto.global.js" />
+      </head>
       <body className={inter.className}>
         <ThemeProvider
           attribute="class"
