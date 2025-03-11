@@ -36,7 +36,7 @@ export default async function DashboardLayout({
           avatar: userData?.image ?? "/default-avatar.png",
         }} />
       <div className="flex flex-col flex-1">
-        <div className="flex justify-between sticky top-0 z-10 bg-white">
+        <div className="flex justify-between sticky top-0 z-10">
           <div>{ConditionalSidebarTrigger ? <ConditionalSidebarTrigger /> : null}</div>
           <div className="hidden sm:flex">
             <NavUser user={{

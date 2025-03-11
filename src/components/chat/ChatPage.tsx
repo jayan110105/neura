@@ -3,7 +3,6 @@
 import { ScrollArea } from "~/components/ui/scroll-area";
 import { Textarea  } from "~/components/ui/textarea";
 import { Button } from "~/components/ui/button";
-import { Card } from "~/components/ui/card";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "~/components/ui/tooltip"
 import { ArrowUp, Save, CalendarPlus, Star, Brain, Lightbulb, Sparkles } from "lucide-react";
 import { cn } from "~/lib/utils";
@@ -61,9 +60,9 @@ export default function ChatPage({ initialMessages }: ChatPageProps) {
                 message.role === 'user' ? "items-end" : "items-start"
               )}
             >
-              <Card className={cn(
+              <div className={cn(
                 "px-6 py-3 max-w-[80%]",
-                message.role === 'user' ? "rounded-full bg-primary text-primary-foreground" : "border-none shadow-none bg-card"
+                message.role === 'user' ? "rounded-full bg-secondary" : "border-none shadow-none bg-none"
               )}>
                 {message.content ? (
                   message.role === 'assistant' ? (
@@ -76,7 +75,7 @@ export default function ChatPage({ initialMessages }: ChatPageProps) {
                   )
                 ) : (
                   message.role === "assistant" && (
-                    <div className="w-5 h-5 bg-black rounded-full animate-grow-shrink"></div>
+                    <div className="w-5 h-5 bg-white rounded-full animate-grow-shrink"></div>
                   )
                 )}
                 {message.content && message.role === 'assistant' && (
@@ -123,15 +122,15 @@ export default function ChatPage({ initialMessages }: ChatPageProps) {
                     
                   </div>
                 )}
-              </Card>
+              </div>
             </div>
           ))}
         </div>
       </ScrollArea>
 
       {/* Input Area */}
-      <div className="bg-white  sticky bottom-0 px-4 mb-4">
-        <div className="max-w-4xl mx-auto border rounded-xl">
+      <div className="sticky bottom-0 px-4 mb-4">
+        <div className="bg-secondary max-w-4xl mx-auto border rounded-xl">
           <form onSubmit={handleSubmit} className="flex items-end p-2">
             <div className="flex-1">
               <Textarea 

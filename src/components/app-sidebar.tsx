@@ -114,9 +114,9 @@ export function AppSidebar({
                 return (
                   <SidebarMenuItem key={item.title} className="mx-2">
                     <SidebarMenuButton className="gap-2.5 py-5" asChild>
-                      <a href={item.url} className={isActive ? "text-black" : "text-gray-500"}>
-                        <item.icon className={`!h-5 !w-5 mr-1 ${isActive ? "text-black" : "text-gray-500"}`} />
-                        <span className={isActive ? "text-black" : "text-gray-500"}>{item.title}</span>
+                      <a href={item.url} className={isActive ? "" : "text-muted-foreground"}>
+                        <item.icon className={`!h-5 !w-5 mr-1 ${isActive ? "" : "text-muted-foreground"}`} />
+                        <span className={isActive ? "" : "text-muted-foreground"}>{item.title}</span>
                       </a>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
