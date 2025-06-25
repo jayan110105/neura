@@ -129,7 +129,7 @@ export default function ChatPage({ initialMessages }: ChatPageProps) {
       </ScrollArea>
 
       {/* Input Area */}
-      <div className="sticky bottom-0 px-4 mb-4">
+      <div className="sticky bottom-0 px-4 mb-4 bg-background">
         <div className="bg-secondary max-w-4xl mx-auto border rounded-xl">
           <form onSubmit={handleSubmit} className="flex items-end p-2">
             <div className="flex-1">

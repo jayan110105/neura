@@ -117,7 +117,7 @@ export default function NoteForm({ userId, onNoteAdded }: NoteFormProps) {
               {newNote.tags.map((tag) => (
                 <Badge key={tag} className="flex items-center gap-1 px-2 py-1 rounded-full">
                   {tag}
-                  <button onClick={() => removeTag(tag)} className="ml-1 text-xs text-white">
+                  <button onClick={() => removeTag(tag)} className="ml-1 text-xs">
                     <X className="h-3 w-3" />
                   </button>
                 </Badge>

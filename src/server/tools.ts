@@ -15,8 +15,6 @@ export const readEmail = tool({
     }),
     execute: async ({ userQuery }) => {
 
-      console.log("userQuery", userQuery);
-
       const session = await auth();
       if (!session?.user?.id) throw new Error("Unauthorized");
   
@@ -26,12 +24,7 @@ export const readEmail = tool({
 
       if (!account?.access_token) throw new Error("No access token found");
 
-      console.log("reached");
-
       const { q, maxResults } = await mailParams(userQuery);
-
-      console.log("q", q);
-      console.log("maxResults", maxResults);
   
       const emails = await fetchEmail(account.access_token, q, maxResults);
 

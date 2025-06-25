@@ -83,6 +83,8 @@ export default {
 		  typography: (theme: (path: string) => string) => ({
 			DEFAULT: {
 			  css: {
+				"--tw-prose-links": "#d1d1d1",
+				"--tw-prose-bold": "#d1d1d1",
 				"--tw-prose-body": "#d1d1d1",
 				h1: {
 				  fontSize: theme('fontSize.2xl'),

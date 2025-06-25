@@ -84,7 +84,7 @@ export default function CalendarPage() {
               <Filter className="h-4 w-4 mr-2" />
               Filter
             </Button>
-            <Button className="flex-1 sm:flex-none">
+            <Button variant="outline" className="flex-1 sm:flex-none">
               <Plus className="h-4 w-4 mr-2" />
               New Event
             </Button>
@@ -114,7 +114,7 @@ export default function CalendarPage() {
                     <Button variant="ghost" size="icon">
                       <Share2 className="h-4 w-4" />
                     </Button>
-                    <Button variant="ghost" size="icon" className="text-destructive">
+                    <Button variant="ghost" size="icon">
                       <Trash2 className="h-4 w-4" />
                     </Button>
                   </div>

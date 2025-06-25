@@ -16,8 +16,6 @@ const emailClassificationSchema = z.object({
 
 export async function mailParams (userQuery: string)
 {
-  console.log("Invoked mailParams");
-  
   const response = await generateObject({
     model: google("gemini-2.0-flash"),
     schema: querySchema,
@@ -37,15 +35,15 @@ export async function mailParams (userQuery: string)
     - If **"unread"** is mentioned, include **is:unread**.
     - Use **maxResults: 10** as the default if not specified.
     - Exclude emails using terms like **"excluding [term]"** ➔ **-[term]**.
-    - Handle date filters by converting natural language dates into **DD/MM/YYYY** format:
-      - **"from last week"** ➔ **after:[DD/MM/YYYY]** (7 days ago).
-      - **"from today"** ➔ **after:[DD/MM/YYYY]** (current date).
+    - Handle date filters by converting natural language dates into **YYYY/MM/DD** format:
+      - **"from last week"** ➔ **after:[YYYY/MM/DD]** (7 days ago).
+      - **"from today"** ➔ **after:[YYYY/MM/DD]** (current date).
 
     **Examples:**
     1. "Fetch my last mail from Updates" ➔ q: 'category:updates', maxResults: 1
     2. "Get 5 unread emails from John" ➔ q: 'is:unread from:John', maxResults: 5
     3. "Show all emails excluding newsletters" ➔ q: '-category:newsletter', maxResults: 10
-    4. "Fetch my mails from today" ➔ q: 'after:21/02/2025', maxResults: 10 (where 21/02/2025 is today's date in DD/MM/YYYY format)
+    4. "Fetch my mails from today" ➔ q: 'after:2025/02/21', maxResults: 10 (where 2025/02/21 is today's date in YYYY/MM/DD format)
 
     Respond ONLY with the JSON object containing 'q' and 'maxResults'.
   `,
@@ -79,9 +77,6 @@ export async function classifyEmail(emailContent: string)
     messages: [{ role: "user", content: emailContent }],
   });
 
-  console.log("content", emailContent);
-  console.log("response", response.object);
-
   return response.object.classification;
 };
 
@@ -112,8 +107,6 @@ export async function summarizeEmail(emailContent: string)
     `,
     messages: [{ role: "user", content: emailContent }],
   });
-
-  console.log("response", response.text);
 
   return response.text;
 };
@@ -194,13 +187,9 @@ export async function fetchEmail(accessToken: string, q: string, maxResults: num
         let emailContent = "";
 
         if (email.data.payload?.body?.data) {
-          console.log('Normal Email Detected');
           emailContent = decodeBase64(email.data.payload.body.data);
         } else if (email.data.payload?.parts) {
-          console.log('Multipart Email Detected');
           emailContent = extractContentFromParts(email.data.payload.parts);
-        } else {
-          console.warn('No valid email content found.');
         }
 
         // Normalize content (remove excessive whitespace)

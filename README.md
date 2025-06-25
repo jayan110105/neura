@@ -1,29 +1,79 @@
-# Create T3 App
+# Neura - Your AI-Powered Personal Assistant
 
-This is a [T3 Stack](https://create.t3.gg/) project bootstrapped with `create-t3-app`.
+Neura is an intelligent personal assistant designed to streamline your productivity. It integrates chat, notes, calendar, email, and tasks into a single, intuitive interface, powered by AI.
 
-## What's next? How do I make an app with this?
+> [!WARNING]
+> **Disclaimer:** This project is currently a work in progress. Some features may not be fully implemented or may not work as expected.
 
-We try to keep this project as simple as possible, so you can start with just the scaffolding we set up for you, and add additional things later when they become necessary.
+## Key Features
 
-If you are not familiar with the different technologies used in this project, please refer to the respective docs. If you still are in the wind, please join our [Discord](https://t3.gg/discord) and ask for help.
+- **AI Chat:** An intelligent, conversational chatbot to assist you with a variety of tasks.
+- **Notes:** A dedicated space to jot down your thoughts, ideas, and reminders.
+- **Calendar:** Keep track of your schedule and appointments.
+- **Email:** Manage your emails directly within the application.
+- **Tasks:** Organize your to-do lists and manage your tasks efficiently.
 
-- [Next.js](https://nextjs.org)
-- [NextAuth.js](https://next-auth.js.org)
-- [Prisma](https://prisma.io)
-- [Drizzle](https://orm.drizzle.team)
-- [Tailwind CSS](https://tailwindcss.com)
-- [tRPC](https://trpc.io)
+## Tech Stack
 
-## Learn More
+- **Framework:** [Next.js](https://nextjs.org/)
+- **Styling:** [Tailwind CSS](https://tailwindcss.com/)
+- **ORM:** [Drizzle ORM](https://orm.drizzle.team/)
+- **Authentication:** [NextAuth.js](https://next-auth.js.org/)
+- **Database:** [PostgreSQL](https://www.postgresql.org/)
+- **AI:** [Google Gemini](https://ai.google.dev/)
+- **AI SDK:** [Vercel AI SDK](https://sdk.vercel.ai/docs)
+- **Deployment:** [Vercel](https://vercel.com/)
 
-To learn more about the [T3 Stack](https://create.t3.gg/), take a look at the following resources:
+## Getting Started
 
-- [Documentation](https://create.t3.gg/)
-- [Learn the T3 Stack](https://create.t3.gg/en/faq#what-learning-resources-are-currently-available) — Check out these awesome tutorials
+Follow these instructions to set up the project locally.
 
-You can check out the [create-t3-app GitHub repository](https://github.com/t3-oss/create-t3-app) — your feedback and contributions are welcome!
+### 1. Prerequisites
 
-## How do I deploy this?
+Make sure you have Node.js and npm installed on your machine.
 
-Follow our deployment guides for [Vercel](https://create.t3.gg/en/deployment/vercel), [Netlify](https://create.t3.gg/en/deployment/netlify) and [Docker](https://create.t3.gg/en/deployment/docker) for more information.
+### 2. Clone the Repository
+
+```bash
+git clone https://github.com/your-username/neura.git
+cd neura
+```
+
+### 3. Install Dependencies
+
+```bash
+npm install
+```
+
+### 4. Set Up Environment Variables
+
+Create a `.env` file in the root of your project and add the following variables.
+
+```
+# Authentication
+AUTH_SECRET="your-super-secret-auth-secret" # Generate one: `openssl rand -hex 32`
+AUTH_GOOGLE_ID="your-google-client-id"
+AUTH_GOOGLE_SECRET="your-google-client-secret"
+
+# Database
+DATABASE_URL="your-postgresql-database-url"
+
+# Google AI
+GOOGLE_GENERATIVE_AI_API_KEY="your-google-ai-api-key"
+```
+
+### 5. Set Up the Database
+
+Run the following command to push the database schema to your PostgreSQL database.
+
+```bash
+npm run db:push
+```
+
+### 6. Run the Development Server
+
+```bash
+npm run dev
+```
+
+Your application should now be running at [http://localhost:3000](http://localhost:3000).
