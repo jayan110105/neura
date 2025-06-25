@@ -35,7 +35,7 @@ Make sure you have Node.js and npm installed on your machine.
 ### 2. Clone the Repository
 
 ```bash
-git clone https://github.com/your-username/neura.git
+git clone https://github.com/jayan110105/neura.git
 cd neura
 ```
 
